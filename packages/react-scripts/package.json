@@ -1,18 +1,18 @@
 {
   "private": false,
-  "name": "@spiffdog/react-scripts",
+  "name": "@built/react-scripts",
   "version": "0.0.1-alpha.09",
   "description": "Configuration and scripts for Create React App.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/spiffdog-design/create-react-app.git"
+    "url": "git+https://github.com/built/create-react-app.git"
   },
   "license": "MIT",
   "engines": {
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/spiffdog-design/create-react-app/issues"
+    "url": "https://github.com/built/create-react-app/issues"
   },
   "files": [
     "bin",
@@ -72,7 +72,7 @@
   "optionalDependencies": {
     "fsevents": "1.1.2"
   },
-  "homepage": "https://github.com/spiffdog-design/create-react-app#readme",
+  "homepage": "https://github.com/built/create-react-app#readme",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"

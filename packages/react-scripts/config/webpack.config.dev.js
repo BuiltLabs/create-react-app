@@ -17,6 +17,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const WatchMissingNodeModulesPlugin = require('react-dev-utils/WatchMissingNodeModulesPlugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TypedCssModulesPlugin = require('./TypedCssModulesPlugin');
 const getClientEnvironment = require('./env');
 const paths = require('./paths');
 
@@ -179,13 +180,18 @@ module.exports = {
           // In production, we use a plugin to extract that CSS to a file, but
           // in development "style" loader enables hot editing of CSS.
           {
-            test: /\.(css|scss)$/,
+            test: /\.s?css$/,
             use: [
               require.resolve('style-loader'),
               {
                 loader: require.resolve('css-loader'),
                 options: {
+                  sourceMap: true,
+                  minimize: false,
+                  camelCase: true,
+                  modules: true,
                   importLoaders: 1,
+                  localIdentName: '[name]__[local]--[hash:base64:5]'
                 },
               },
               {
@@ -197,14 +203,18 @@ module.exports = {
                   sourceMap: true,
                   plugins: () => [
                     require('postcss-flexbugs-fixes'),
-                    autoprefixer({
+                    require('postcss-cssnext')({
                       browsers: [
                         '>1%',
                         'last 4 versions',
                         'Firefox ESR',
                         'not ie < 9', // React doesn't support IE8 anyway
                       ],
+                      features: {
+                        autoprefixer: {
                       flexbox: 'no-2009',
+                        },
+                      },
                     }),
                   ],
                 },
@@ -226,7 +236,7 @@ module.exports = {
             // its runtime that would otherwise processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
-            exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
+            exclude: [/\.(js|jsx|mjs)$/, /\.(ts|tsx)$/, /\.html$/, /\.json$/],
             loader: require.resolve('file-loader'),
             options: {
               name: 'static/media/[name].[hash:8].[ext]',
@@ -271,6 +281,10 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // Generate type definitions for each CSS modules either before the
+    // production build starts, or before each re-compilation after watch.
+    // https://github.com/zhenwenc/create-react-app/issues/4
+    new TypedCssModulesPlugin({ useCache: true, camelCase: 'dashes' }),
     // Perform type checking and linting in a separate process to speed up compilation
     new ForkTsCheckerWebpackPlugin({
       async: false,

@@ -18,6 +18,7 @@ const InterpolateHtmlPlugin = require('react-dev-utils/InterpolateHtmlPlugin');
 const SWPrecacheWebpackPlugin = require('sw-precache-webpack-plugin');
 const ModuleScopePlugin = require('react-dev-utils/ModuleScopePlugin');
 const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
+const TypedCssModulesPlugin = require('./TypedCssModulesPlugin');
 const paths = require('./paths');
 const getClientEnvironment = require('./env');
 
@@ -190,7 +191,7 @@ module.exports = {
           // use the "style" loader inside the async code so CSS from them won't be
           // in the main CSS file.
           {
-            test: /\.css$/,
+            test: /\.s?css$/,
             loader: ExtractTextPlugin.extract(
               Object.assign(
                 {
@@ -207,6 +208,9 @@ module.exports = {
                         importLoaders: 1,
                         minimize: true,
                         sourceMap: shouldUseSourceMap,
+                        camelCase: true,
+                        modules: true,
+                        localIdentName: '[name]__[local]--[hash:base64:5]',
                       },
                     },
                     {
@@ -218,14 +222,18 @@ module.exports = {
                         sourceMap: true,
                         plugins: () => [
                           require('postcss-flexbugs-fixes'),
-                          autoprefixer({
+                          require('postcss-cssnext')({
                             browsers: [
                               '>1%',
                               'last 4 versions',
                               'Firefox ESR',
                               'not ie < 9', // React doesn't support IE8 anyway
                             ],
-                            flexbox: 'no-2009',
+                            features: {
+                              autoprefixer: {
+                                flexbox: 'no-2009',
+                              },
+                            },
                           }),
                         ],
                       },
@@ -252,7 +260,7 @@ module.exports = {
             // it's runtime that would otherwise processed through "file" loader.
             // Also exclude `html` and `json` extensions so they get processed
             // by webpacks internal loaders.
-            exclude: [/\.(js|jsx|mjs)$/, /\.html$/, /\.json$/],
+            exclude: [/\.(js|jsx|mjs)$/, /\.(ts|tsx)$/, /\.html$/, /\.json$/],
             options: {
               name: 'static/media/[name].[hash:8].[ext]',
             },
@@ -359,6 +367,10 @@ module.exports = {
     // https://github.com/jmblog/how-to-optimize-momentjs-with-webpack
     // You can remove this if you don't use Moment.js:
     new webpack.IgnorePlugin(/^\.\/locale$/, /moment$/),
+    // Generate type definitions for each CSS modules either before the
+    // production build starts, or before each re-compilation after watch.
+    // https://github.com/zhenwenc/create-react-app/issues/4
+    new TypedCssModulesPlugin({ useCache: true, camelCase: 'dashes' }),
     // Perform type checking and linting in a separate process to speed up compilation
     new ForkTsCheckerWebpackPlugin({
       async: false,

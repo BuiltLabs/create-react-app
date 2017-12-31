@@ -26,8 +26,7 @@ module.exports = function(
   originalDirectory,
   template
 ) {
-  const ownPackageName = require(path.join(__dirname, '..', 'package.json'))
-    .name;
+  const ownPackageName = require(path.join(__dirname, '..', 'package.json')).name;
   const ownPath = path.join(appPath, 'node_modules', ownPackageName);
   const appPackage = require(path.join(appPath, 'package.json'));
   const useYarn = fs.existsSync(path.join(appPath, 'yarn.lock'));
@@ -37,6 +36,7 @@ module.exports = function(
 
   // Setup the script rules
   appPackage.scripts = {
+    analyze: 'source-map-explorer build/static/js/main.*',
     start: 'react-scripts start',
     build: 'react-scripts build',
     test: 'react-scripts test --watchAll --env=jsdom',
@@ -89,6 +89,7 @@ module.exports = function(
     }
   );
 
+  // Generate dependency blocks in templated project.
   let command;
   let args;
 
@@ -99,14 +100,15 @@ module.exports = function(
     command = 'npm';
     args = ['install', '--save', verbose && '--verbose'].filter(e => e);
   }
-  args.push('react', 'react-dom');
+  // Install app dependencies
+  // args.push(
+  //   'react', 
+  //   'react-dom'
+  // );
 
   // Install dev dependencies
   const types = [
-    '@types/node',
-    '@types/react',
-    '@types/react-dom',
-    '@types/jest',
+    'source-map-explorer'
   ];
 
   console.log(`Installing ${types.join(', ')} as dev dependencies ${command}...`);
@@ -131,20 +133,6 @@ module.exports = function(
       })
     );
     fs.unlinkSync(templateDependenciesPath);
-  }
-
-  // Install react and react-dom for backward compatibility with old CRA cli
-  // which doesn't install react and react-dom along with react-scripts
-  // or template is presetend (via --internal-testing-template)
-  if (!isReactInstalled(appPackage) || template) {
-    console.log(`Installing react and react-dom using ${command}...`);
-    console.log();
-
-    const proc = spawn.sync(command, args, { stdio: 'inherit' });
-    if (proc.status !== 0) {
-      console.error(`\`${command} ${args.join(' ')}\` failed`);
-      return;
-    }
   }
 
   // Display the most elegant way to cd.

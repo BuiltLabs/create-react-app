@@ -1,6 +1,6 @@
 {
   "private": false,
-  "name": "@spiffdog/built-react-scripts",
+  "name": "@built/react-scripts",
   "version": "0.0.1-alpha.6",
   "description": "Configuration and scripts for Create React App.",
   "repository": {

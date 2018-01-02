@@ -5,14 +5,14 @@
   "description": "Configuration and scripts for Create React App.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/built/create-react-app.git"
+    "url": "git+https://github.com/BuiltLabs/create-react-app.git"
   },
   "license": "MIT",
   "engines": {
     "node": ">=6"
   },
   "bugs": {
-    "url": "https://github.com/built/create-react-app/issues"
+    "url": "https://github.com/BuiltLabs/create-react-app/issues"
   },
   "files": [
     "bin",
